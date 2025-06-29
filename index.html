@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>BeCity Server</title>
+  <style>
+    body { margin:0; font-family:sans-serif; background:#1a1a1a; color:white; overflow-x:hidden; }
+    header {
+      position:relative;
+      background:url('https://yt3.googleusercontent.com/ml3sMeUn95hrBITSb7DAs3KrJIp--zbieKrZcNp-IEiUR0VINvsJNHmKhh9nvpcmCpElUn7JWw=w2120-fcrop64=1,00000000ffffffff-k-c0xffffffff-no-nd-rj') center/cover no-repeat;
+      height:300px;
+      clip-path:polygon(0 0,100% 0,100% 85%,50% 100%,0 85%);
+      display:flex; justify-content:space-between; align-items:center;
+      padding:20px 40px;
+    }
+    header::after {
+      content:''; position:absolute; bottom:0; left:0; width:100%; height:4px; background:white;
+    }
+    .logo { width:60px; height:60px; border-radius:50%; border:2px solid white; opacity:0; transition:opacity .6s;}
+    .scrolled .logo { opacity:1; }
+    .center-title { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+      font-size:3em; font-weight:bold; text-shadow:0 0 10px black; }
+    .links { display:flex; gap:20px; align-items:center; z-index:1; }
+    .links a { color:white; text-decoration:none; background:rgba(0,0,0,0.4);
+      padding:8px 12px; border-radius:6px; transition:background .3s; }
+    .links a:hover { background:rgba(255,255,255,0.2); }
+
+    main { padding:20px; max-width:800px; margin:0 auto; }
+    .server-status, .discord-status { background:#2a2a2a; padding:15px;
+      border-radius:8px; margin:15px 0; }
+    .news { background:#2a2a2a; padding:20px; border-radius:8px; margin:30px 0; }
+    .news h3 { margin-top:0; }
+
+  </style>
+ <style> .header-outline { height: 300px; margin-top: -300px; /* gleiche Höhe wie Header, damit es direkt darunter sitzt */ background: white; clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%); z-index: -1; /* liegt unter dem Header */ position: relative; } header { position: relative; background: url('https://yt3.googleusercontent.com/ml3sMeUn95hrBITSb7DAs3KrJIp--zbieKrZcNp-IEiUR0VINvsJNHmKhh9nvpcmCpElUn7JWw=w2120-fcrop64=1,00000000ffffffff-k-c0xffffffff-no-nd-rj') center/cover no-repeat; height: 300px; clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%); z-index: 1; } </style>
+</head>
+<body>
+
+  <header id="site-header">
+    <div class="links">
+      <a href="https://discord.gg/gY5kUpWQFT" target="_blank">💬 Discord
+      <h6>Hänge mit <strong><span id="member-count">…wird geladen…</span></strong> Midgleidern auf unserem Discord ab!</h6></a>
+      <img class="logo" id="site-logo" src="https://yt3.googleusercontent.com/86dk7UTTcgI5Och4v8ARnVomIAvO-3fAbue7GhNOEWW7TC_tQCAgWmix3OQ4I3sNL2wPBb0lYg=s800-c-k-c0x00ffffff-no-rj" alt="BeCity Logo">
+    </div>
+    <div class="center-title">BeCity</div>
+    <div class="links">
+      <a href="#">🎮 community.aternos.me
+      <p id="status">⏳ Status wird abgefragt…</p></a>
+    </div>
+    </div>
+  </header>
+  <div class="header-outline"></div>
+
+  <main>
+
+
+    <div class="news">
+      <h3>📰 News & Infos</h3>
+      <ul>
+        <li>Neuer Spawn-Bereich geplant – Bauphase läuft!</li>
+        <li>Event nächstes Wochenende: PVP-Turnier ab Samstag 18 Uhr</li>
+        <li>Neuer YouTube‑Clip veröffentlicht – seht rein! 📺</li>
+      </ul>
+    </div>
+  </main>
+
+  <script>
+    // Scroll-Effekt für Logo
+    window.addEventListener('scroll', () => {
+      document.body.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // Minecraft Serverstatus
+    async function checkServerStatus() {
+      const ip = 'community.aternos.me';
+      try {
+        const res = await fetch(`https://api.mcsrvstat.us/2/${ip}`);
+        const data = await res.json();
+        const el = document.getElementById('status');
+        if (!data.online) el.textContent = '❌ Server offline';
+        else el.textContent = `🟢 ${data.players.online}/${data.players.max} Spieler online`;
+      } catch {
+        document.getElementById('status').textContent = '⚠️ Fehler beim Abrufen';
+      }
+    }
+    checkServerStatus();
+    setInterval(checkServerStatus, 60000);
+
+    // Discord-Mitglieder über Invite-API
+    async function fetchDiscordCount() {
+      const invite = 'gY5kUpWQFT';
+      try {
+        const res = await fetch(`https://discord.com/api/v9/invites/${invite}?with_counts=true`);
+        const js = await res.json();
+        document.getElementById('member-count').textContent = js.approximate_member_count;
+      } catch {
+        document.getElementById('member-count').textContent = '⚠️ Fehler';
+      }
+    }
+    fetchDiscordCount();
+  </script>
+
+</body>
+</html>
