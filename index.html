@@ -99,7 +99,7 @@
   </script>
   <script>
 async function loadRSS() {
-  const response = await fetch("https://meineseite.de/feed.xml");
+  const response = await fetch("https://voice.de.cool/becity/news.xml");
   const text = await response.text();
   const parser = new DOMParser();
   const xml = parser.parseFromString(text, "text/xml");
