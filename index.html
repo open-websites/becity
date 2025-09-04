@@ -58,6 +58,34 @@
       <h3>📰 News & Infos</h3>
       <ul>
         <li>Es gibt keine aktuellen News</li>
+        <div id="feed">News werden geladen...</div>
+
+<script>
+  async function loadFeed() {
+    try {
+      const response = await fetch("https://corsproxy.io/?" + encodeURIComponent("https://voice.de.cool/becity/news.xml"));
+      const text = await response.text();
+
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(text, "application/xml");
+
+      const items = xml.querySelectorAll("item");
+      let html = "<ul>";
+      items.forEach(item => {
+        const title = item.querySelector("title")?.textContent;
+        const link = item.querySelector("link")?.textContent;
+        html += `<li><a href="${link}" target="_blank">${title}</a></li>`;
+      });
+      html += "</ul>";
+
+      document.getElementById("feed").innerHTML = html;
+    } catch (err) {
+      document.getElementById("feed").innerText = "❌ Feed konnte nicht geladen werden.";
+    }
+  }
+
+  loadFeed();
+</script>
       </ul>
     </div>
   </main>
@@ -97,25 +125,7 @@
     }
     fetchDiscordCount();
   </script>
-  <script>
-async function loadRSS() {
-  const response = await fetch("https://voice.de.cool/becity/news.xml");
-  const text = await response.text();
-  const parser = new DOMParser();
-  const xml = parser.parseFromString(text, "text/xml");
-  const items = xml.querySelectorAll("item");
-
-  items.forEach(item => {
-    const title = item.querySelector("title").textContent;
-    const link = item.querySelector("link").textContent;
-    const desc = item.querySelector("description").textContent;
-
-    document.body.innerHTML += `<h3><a href="${link}">${title}</a></h3><p>${desc}</p>`;
-  });
-}
-loadRSS();
-</script>
-
+ 
 
 </body>
 </html>
